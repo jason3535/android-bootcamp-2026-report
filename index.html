@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android Bootcamp 2026 — Nothing Analysis</title>
+<style>
+/* ========================================
+   Nothing Design System — Light Theme
+   - White background, dark text
+   - Monospace / dot-matrix typography
+   - Red (#D71921) as primary accent
+   - Minimal, industrial, transparent
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+    --nothing-red: #D71921;
+    --nothing-red-light: #FEF0F0;
+    --nothing-red-dim: rgba(215, 25, 33, 0.08);
+    --nothing-black: #000000;
+    --nothing-white: #FFFFFF;
+    --nothing-bg: #F7F7F7;
+    --nothing-card: #FFFFFF;
+    --nothing-text: #1A1A1A;
+    --nothing-text-2: #555555;
+    --nothing-text-3: #888888;
+    --nothing-border: #E2E2E2;
+    --nothing-border-light: #F0F0F0;
+    --nothing-green: #1B873F;
+    --nothing-green-bg: #F0FDF4;
+    --nothing-yellow: #A16207;
+    --nothing-yellow-bg: #FEFCE8;
+    --nothing-blue: #0369A1;
+    --nothing-blue-bg: #F0F9FF;
+    --font-mono: 'Space Mono', 'SF Mono', 'Menlo', monospace;
+    --font-body: 'Space Grotesk', 'Noto Sans SC', 'PingFang SC', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--nothing-text);
+    background: var(--nothing-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+    background: var(--nothing-red);
+    color: white;
+}
+
+.container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 16px;
+}
+
+/* ---- Cover ---- */
+.cover {
+    position: relative;
+    padding: 64px 48px 48px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    background: var(--nothing-black);
+    color: white;
+}
+.cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 20% 60%, rgba(215,25,33,0.12) 0%, transparent 50%);
+    pointer-events: none;
+}
+.cover .dot-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+.cover h1 {
+    font-family: var(--font-body);
+    font-size: 38px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+.cover h1 span { color: var(--nothing-red); }
+.cover .subtitle {
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 28px;
+}
+.cover-meta {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+.cover-meta-item {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+}
+.cover-meta-item .val {
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+}
+.glyph-dots {
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-template-columns: repeat(5, 10px);
+    gap: 8px;
+    opacity: 0.12;
+}
+.glyph-dots .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: white;
+}
+.glyph-dots .dot.red { background: var(--nothing-red); opacity: 1; }
+.glyph-dots .dot.off { opacity: 0.15; }
+
+/* ---- TOC ---- */
+.toc {
+    border: 1px solid var(--nothing-border);
+    background: var(--nothing-card);
+    padding: 18px 24px;
+    margin-bottom: 24px;
+    position: sticky;
+    top: 8px;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.toc summary {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--nothing-red);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 4px 0;
+    list-style: none;
+}
+.toc summary::before { content: '[ '; }
+.toc summary::after { content: ' ]'; }
+.toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0 12px;
+    margin-top: 12px;
+}
+.toc a {
+    color: var(--nothing-text-2);
+    text-decoration: none;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+}
+.toc a:hover {
+    color: var(--nothing-text);
+    background: var(--nothing-bg);
+    border-left-color: var(--nothing-red);
+}
+.toc a .num {
+    color: var(--nothing-red);
+    font-weight: 700;
+    min-width: 22px;
+}
+
+/* ---- Section ---- */
+.section {
+    background: var(--nothing-card);
+    border: 1px solid var(--nothing-border);
+    padding: 32px 36px;
+    margin-bottom: 20px;
+    position: relative;
+}
+.section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--nothing-red);
+}
+
+.section h2 {
+    font-family: var(--font-body);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--nothing-black);
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+}
+.section h2 .section-num {
+    font-family: var(--font-mono);
+    color: var(--nothing-red);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 6px;
+}
+.section .section-divider {
+    width: 40px;
+    height: 2px;
+    background: var(--nothing-red);
+    margin: 12px 0 24px;
+}
+
+.section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--nothing-black);
+    margin: 28px 0 12px;
+    padding-left: 14px;
+    border-left: 3px solid var(--nothing-border);
+}
+
+.section h4 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--nothing-red);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 20px 0 8px;
+}
+
+/* ---- Priorities ---- */
+.priorities {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+.priority-card {
+    text-align: center;
+    padding: 22px 12px 18px;
+    border: 1px solid var(--nothing-border);
+    background: var(--nothing-card);
+    transition: all 0.2s;
+}
+.priority-card:hover {
+    border-color: var(--nothing-red);
+    box-shadow: 0 2px 12px rgba(215,25,33,0.08);
+}
+.priority-card .p-num {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--nothing-red);
+    margin-bottom: 8px;
+}
+.priority-card .p-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--nothing-black);
+    margin-bottom: 6px;
+}
+.priority-card .p-desc {
+    font-size: 11px;
+    color: var(--nothing-text-3);
+    line-height: 1.5;
+}
+
+/* ---- Table ---- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+}
+th {
+    background: var(--nothing-bg);
+    color: var(--nothing-text-3);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--nothing-border);
+}
+td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--nothing-border-light);
+    color: var(--nothing-text);
+}
+tr:hover td {
+    background: var(--nothing-bg);
+}
+td strong { color: var(--nothing-black); }
+
+/* ---- Tags ---- */
+.tag {
+    display: inline-block;
+    padding: 2px 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.tag-new { background: var(--nothing-red-light); color: var(--nothing-red); border: 1px solid rgba(215,25,33,0.2); }
+.tag-available { background: var(--nothing-green-bg); color: var(--nothing-green); border: 1px solid rgba(27,135,63,0.2); }
+.tag-upcoming { background: var(--nothing-yellow-bg); color: var(--nothing-yellow); border: 1px solid rgba(161,98,7,0.2); }
+.tag-mandatory { background: var(--nothing-red-light); color: var(--nothing-red); border: 1px solid rgba(215,25,33,0.2); }
+
+/* ---- Callout ---- */
+.callout {
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.7;
+    border-left: 3px solid;
+    border-radius: 0;
+}
+.callout-info {
+    background: var(--nothing-blue-bg);
+    border-color: var(--nothing-blue);
+    color: var(--nothing-blue);
+}
+.callout-warn {
+    background: var(--nothing-yellow-bg);
+    border-color: var(--nothing-yellow);
+    color: var(--nothing-yellow);
+}
+.callout-tip {
+    background: var(--nothing-green-bg);
+    border-color: var(--nothing-green);
+    color: var(--nothing-green);
+}
+.callout strong { color: inherit; }
+
+/* ---- Two Col ---- */
+.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+}
+.two-col > div {
+    background: var(--nothing-bg);
+    border: 1px solid var(--nothing-border);
+    padding: 20px;
+}
+
+/* ---- Action Items ---- */
+.action-items { margin: 14px 0; }
+.action-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 14px;
+    margin: 5px 0;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    transition: background 0.15s;
+}
+.action-item:hover { background: var(--nothing-bg); }
+.action-item .dot {
+    width: 8px; height: 8px;
+    margin-top: 6px;
+    margin-right: 14px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+.action-must .dot { background: var(--nothing-red); }
+.action-should .dot { background: var(--nothing-yellow); }
+.action-nice .dot { background: var(--nothing-green); }
+.action-must { background: var(--nothing-red-light); border-left-color: var(--nothing-red); }
+.action-should { background: var(--nothing-yellow-bg); border-left-color: var(--nothing-yellow); }
+.action-nice { background: var(--nothing-green-bg); border-left-color: var(--nothing-green); }
+.action-item strong { color: var(--nothing-black); }
+
+/* ---- Timeline ---- */
+.timeline {
+    margin: 24px 0;
+    padding-left: 28px;
+    border-left: 2px solid var(--nothing-border);
+}
+.timeline-item {
+    padding: 14px 0 14px 24px;
+    position: relative;
+}
+.timeline-item::before {
+    content: '';
+    width: 10px; height: 10px;
+    background: var(--nothing-red);
+    border-radius: 50%;
+    position: absolute;
+    left: -34px;
+    top: 20px;
+    border: 2px solid var(--nothing-card);
+    box-shadow: 0 0 0 2px var(--nothing-red);
+}
+.timeline-item .date {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--nothing-black);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+.timeline-item .events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.timeline-item .events span {
+    display: inline-block;
+    background: var(--nothing-bg);
+    border: 1px solid var(--nothing-border);
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--nothing-text-2);
+}
+
+/* ---- Lists ---- */
+ul { padding-left: 0; margin: 8px 0; list-style: none; }
+li {
+    margin-bottom: 6px;
+    font-size: 13px;
+    padding-left: 16px;
+    position: relative;
+    color: var(--nothing-text);
+}
+li::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: var(--nothing-red);
+    position: absolute;
+    left: 0;
+    top: 10px;
+}
+li strong { color: var(--nothing-black); }
+li ul { margin-top: 4px; }
+li li::before { background: var(--nothing-text-3); width: 3px; height: 3px; }
+
+p { margin: 8px 0; font-size: 13px; color: var(--nothing-text-2); }
+
+code {
+    background: var(--nothing-bg);
+    border: 1px solid var(--nothing-border);
+    padding: 1px 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--nothing-red);
+}
+
+/* ---- Footer ---- */
+.footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--nothing-text-3);
+    letter-spacing: 1px;
+    border-top: 1px solid var(--nothing-border);
+    margin-top: 24px;
+}
+.footer .nda { color: var(--nothing-red); font-weight: 700; }
+
+/* ---- Language Toggle ---- */
+.lang-toggle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    background: var(--nothing-black);
+    color: var(--nothing-white);
+    border: 1px solid var(--nothing-text-3);
+    border-left: none;
+    padding: 0 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+.lang-toggle:hover {
+    border-color: var(--nothing-red);
+    color: var(--nothing-red);
+}
+.lang-toggle .slash { color: var(--nothing-red); margin: 0 4px; }
+.lang-toggle .active { color: var(--nothing-red); font-weight: 700; }
+
+/* ---- Top Bar ---- */
+.top-bar {
+    position: fixed;
+    top: 0; right: 0;
+    z-index: 999;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 12px 16px;
+}
+.top-bar > button {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---- Chat Panel ---- */
+.chat-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    background: var(--nothing-black);
+    color: var(--nothing-white);
+    border: 1px solid var(--nothing-text-3);
+    padding: 0 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    gap: 6px;
+}
+.chat-btn:hover {
+    border-color: var(--nothing-red);
+    color: var(--nothing-red);
+}
+.chat-btn .icon { font-style: normal; font-size: 13px; }
+
+.chat-overlay {
+    display: none;
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 420px;
+    z-index: 1000;
+    background: var(--nothing-card);
+    border-left: 1px solid var(--nothing-border);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+    flex-direction: column;
+}
+.chat-overlay.open { display: flex; }
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--nothing-border);
+    background: var(--nothing-black);
+    color: var(--nothing-white);
+}
+.chat-header-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.chat-header-title span { color: var(--nothing-red); }
+.chat-close {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s;
+}
+.chat-close:hover { border-color: var(--nothing-red); color: var(--nothing-red); }
+
+.chat-apikey-bar {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--nothing-border);
+    background: var(--nothing-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.chat-apikey-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.chat-apikey-bar label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--nothing-text-3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.chat-apikey-bar input {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 8px;
+    border: 1px solid var(--nothing-border);
+    background: var(--nothing-card);
+    color: var(--nothing-text);
+    outline: none;
+}
+.chat-apikey-bar input:focus { border-color: var(--nothing-red); }
+.chat-apikey-bar select {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 8px;
+    border: 1px solid var(--nothing-border);
+    background: var(--nothing-card);
+    color: var(--nothing-text);
+    outline: none;
+    cursor: pointer;
+    min-width: 120px;
+}
+.chat-apikey-bar select:focus { border-color: var(--nothing-red); }
+.chat-apikey-bar .key-status {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--nothing-border);
+    flex-shrink: 0;
+}
+.chat-apikey-bar .key-status.active { background: #1B873F; }
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-msg {
+    max-width: 92%;
+    font-size: 13px;
+    line-height: 1.65;
+    padding: 10px 14px;
+}
+.chat-msg-user {
+    align-self: flex-end;
+    background: var(--nothing-black);
+    color: var(--nothing-white);
+}
+.chat-msg-bot {
+    align-self: flex-start;
+    background: var(--nothing-bg);
+    color: var(--nothing-text);
+    border: 1px solid var(--nothing-border);
+}
+.chat-msg-bot strong { color: var(--nothing-red); }
+.chat-msg-bot code {
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    font-size: 12px;
+}
+.chat-msg-bot .src-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--nothing-red);
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.chat-input-area {
+    padding: 12px 16px;
+    border-top: 1px solid var(--nothing-border);
+    display: flex;
+    gap: 8px;
+}
+.chat-input {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 10px 14px;
+    border: 1px solid var(--nothing-border);
+    background: var(--nothing-bg);
+    color: var(--nothing-text);
+    outline: none;
+    transition: border-color 0.15s;
+}
+.chat-input:focus { border-color: var(--nothing-red); }
+.chat-input::placeholder { color: var(--nothing-text-3); }
+.chat-send {
+    background: var(--nothing-red);
+    color: white;
+    border: none;
+    padding: 0 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    text-transform: uppercase;
+}
+.chat-send:hover { opacity: 0.85; }
+
+.chat-suggestions {
+    padding: 0 20px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.chat-suggestions button {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 5px 10px;
+    background: none;
+    border: 1px solid var(--nothing-border);
+    color: var(--nothing-text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.chat-suggestions button:hover {
+    border-color: var(--nothing-red);
+    color: var(--nothing-red);
+}
+
+/* highlight search matches in page */
+mark.chat-highlight {
+    background: rgba(215,25,33,0.15);
+    color: var(--nothing-red);
+    padding: 1px 2px;
+    border-radius: 1px;
+    outline: 2px solid rgba(215,25,33,0.3);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .priorities { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr 1fr; }
+    .cover h1 { font-size: 28px; }
+    .glyph-dots { display: none; }
+    .section { padding: 20px; }
+}
+
+@media print {
+    body { background: white; }
+    .toc { position: static; }
+    .section { box-shadow: none; }
+    .cover { color: white !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <button class="chat-btn" onclick="toggleChat()">
+        <em class="icon">?</em> Ask
+    </button>
+    <button class="lang-toggle" onclick="toggleLang()" style="position:static;">
+        <span id="lang-zh" class="active">CN</span><span class="slash">/</span><span id="lang-en">EN</span>
+    </button>
+</div>
+
+<!-- Chat Panel -->
+<div class="chat-overlay" id="chatPanel">
+    <div class="chat-header">
+        <div class="chat-header-title"><span>?</span> Report Assistant</div>
+        <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-apikey-bar">
+        <div class="chat-apikey-row">
+            <label>Provider</label>
+            <select id="providerSelect" onchange="onProviderChange()">
+                <option value="anthropic">Anthropic (Claude)</option>
+                <option value="openai">OpenAI (GPT)</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="custom">Custom Endpoint</option>
+            </select>
+        </div>
+        <div class="chat-apikey-row">
+            <label>API Key</label>
+            <input type="password" id="apiKeyInput" placeholder="sk-ant-..." oninput="onApiKeyChange()">
+            <div class="key-status" id="keyStatus"></div>
+        </div>
+        <div class="chat-apikey-row" id="customEndpointRow" style="display:none;">
+            <label>Endpoint</label>
+            <input type="text" id="customEndpoint" placeholder="https://api.example.com/v1/chat/completions">
+        </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg chat-msg-bot">
+            Hi! 请先输入 Anthropic API Key，然后可以基于报告内容进行问答。
+        </div>
+    </div>
+    <div class="chat-suggestions" id="chatSuggestions">
+        <button onclick="askSuggestion(this)">Nano V4 什么时候发布?</button>
+        <button onclick="askSuggestion(this)">Nothing 必须做的事项有哪些?</button>
+        <button onclick="askSuggestion(this)">What is App Lock?</button>
+        <button onclick="askSuggestion(this)">通知摘要需要什么集成?</button>
+        <button onclick="askSuggestion(this)">ANGLE 的要求是什么?</button>
+    </div>
+    <div class="chat-input-area">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Ask about the report..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" onclick="sendChat()">Send</button>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- COVER -->
+<div class="cover">
+    <div class="glyph-dots">
+        <div class="dot off"></div><div class="dot"></div><div class="dot off"></div><div class="dot"></div><div class="dot off"></div>
+        <div class="dot"></div><div class="dot off"></div><div class="dot red"></div><div class="dot off"></div><div class="dot"></div>
+        <div class="dot off"></div><div class="dot"></div><div class="dot off"></div><div class="dot"></div><div class="dot off"></div>
+        <div class="dot"></div><div class="dot off"></div><div class="dot"></div><div class="dot off"></div><div class="dot red"></div>
+        <div class="dot off"></div><div class="dot red"></div><div class="dot off"></div><div class="dot"></div><div class="dot off"></div>
+        <div class="dot"></div><div class="dot off"></div><div class="dot"></div><div class="dot off"></div><div class="dot"></div>
+        <div class="dot red"></div><div class="dot off"></div><div class="dot"></div><div class="dot off"></div><div class="dot"></div>
+        <div class="dot off"></div><div class="dot"></div><div class="dot off"></div><div class="dot red"></div><div class="dot off"></div>
+    </div>
+    <div class="dot-label">Nothing · Internal Analysis</div>
+    <h1>Google Android<br>Bootcamp <span>2026</span></h1>
+    <div class="subtitle">Android 17 新特性完整分析 · NothingOS 团队视角</div>
+    <div class="cover-meta">
+        <div class="cover-meta-item">Date <span class="val">2026.02</span></div>
+        <div class="cover-meta-item">Tracks <span class="val">15</span></div>
+        <div class="cover-meta-item">Materials <span class="val">20 PDFs</span></div>
+        <div class="cover-meta-item">Classification <span class="val">NDA</span></div>
+    </div>
+</div>
+
+<!-- TOC -->
+<details class="toc" open>
+    <summary>Index</summary>
+    <div class="toc-grid">
+        <a href="#s1"><span class="num">01</span> 战略优先级</a>
+        <a href="#s2"><span class="num">02</span> AI 能力</a>
+        <a href="#s3"><span class="num">03</span> 系统 UX / UI</a>
+        <a href="#s4"><span class="num">04</span> 防盗与安全</a>
+        <a href="#s5"><span class="num">05</span> Better Together</a>
+        <a href="#s6"><span class="num">06</span> Telephony</a>
+        <a href="#s7"><span class="num">07</span> Camera & Media</a>
+        <a href="#s8"><span class="num">08</span> Core OS</a>
+        <a href="#s9"><span class="num">09</span> Gaming & Graphics</a>
+        <a href="#s10"><span class="num">10</span> 大屏幕体验</a>
+        <a href="#s11"><span class="num">11</span> Onboarding</a>
+        <a href="#s12"><span class="num">12</span> Kernel</a>
+        <a href="#s13"><span class="num">13</span> 虚拟化</a>
+        <a href="#s14"><span class="num">14</span> Enterprise</a>
+        <a href="#s15"><span class="num">15</span> 行动项</a>
+        <a href="#s16"><span class="num">16</span> 时间线</a>
+    </div>
+</details>
+
+<!-- 01 -->
+<div class="section" id="s1">
+    <h2><span class="section-num">01</span>大会概览与战略优先级</h2>
+    <div class="section-divider"></div>
+    <div class="priorities">
+        <div class="priority-card"><div class="p-num">01</div><div class="p-name">AI Innovation</div><div class="p-desc">Gemini 全栈 AI 深度集成到 Android 各层</div></div>
+        <div class="priority-card"><div class="p-num">02</div><div class="p-name">Effortless Android</div><div class="p-desc">降低使用门槛，提升流畅度和易用性</div></div>
+        <div class="priority-card"><div class="p-num">03</div><div class="p-name">Quality & Reliability</div><div class="p-desc">系统质量、Vulkan 驱动稳定性、测试覆盖</div></div>
+        <div class="priority-card"><div class="p-num">04</div><div class="p-name">Multi-Devices</div><div class="p-desc">手机/平板/手表/耳机/XR/TV/Auto 统一</div></div>
+        <div class="priority-card"><div class="p-num">05</div><div class="p-name">New Audiences</div><div class="p-desc">吸引新用户群体，包括 iOS 转入者</div></div>
+    </div>
+    <div class="callout callout-info">
+        <strong>核心信号：</strong>Google 明确将 AI 定位为 Android 对抗 iOS 的最大差异化武器。Gemini 3 的评价极高，媒体和市场已认可 "AI is Android's moment"。
+    </div>
+</div>
+
+<!-- 02 AI -->
+<div class="section" id="s2">
+    <h2><span class="section-num">02</span>AI 能力</h2>
+    <div class="section-divider"></div>
+
+    <h3>Gemini Nano 演进路线</h3>
+    <table>
+        <tr><th>Version</th><th>Core Capability</th><th>Timeline</th><th>Status</th></tr>
+        <tr><td>Nano V1</td><td>文本理解</td><td>2023.12</td><td><span class="tag tag-available">Launched</span></td></tr>
+        <tr><td>Nano V2</td><td>图像理解 + 多语言 + MobileNet 编码器</td><td>2025 Q2</td><td><span class="tag tag-available">Launched</span></td></tr>
+        <tr><td>Nano V3</td><td><strong>屏幕理解 + Function Calling + 动作执行</strong></td><td>Now</td><td><span class="tag tag-available">Available</span></td></tr>
+        <tr><td>Nano V4</td><td><strong>性能效率大幅提升，内存占用更小，质量不降</strong></td><td>2026 H2</td><td><span class="tag tag-upcoming">Base 3月发布</span></td></tr>
+    </table>
+    <div class="callout callout-warn">
+        <strong>Action Required：</strong>Nano V4 base model 将于 2026 年 3 月发布，Nothing 应尽早评估并构建特性。现有设备应升级到 V4 以获得系统健康收益。
+    </div>
+
+    <h3>AICore 非 LLM 模型支持</h3>
+    <p>OEM 可在不满足 LLM 要求的设备上集成 AICore，<strong>最低仅需 6GB RAM</strong>：</p>
+    <div class="two-col">
+        <div>
+            <h4>Three Model Options</h4>
+            <ul>
+                <li><strong>语义搜索</strong>：300M 参数嵌入模型，自然语言查找</li>
+                <li><strong>轻量级 ASR & TTS</strong>：270M 参数 Transformer</li>
+                <li><strong>主动辅助</strong>：20-50M 参数动作模型</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Impact for Nothing</h4>
+            <ul>
+                <li>中端设备（6GB+）可接入 AI 能力</li>
+                <li>预装 AICore APK 即可启用</li>
+                <li>不依赖 Gemini Nano，降低硬件门槛</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>重点 AI 功能</h3>
+
+    <h4>My Voice Live Translate API</h4>
+    <ul>
+        <li>实时语音翻译，<strong>保留说话者原始声音</strong></li>
+        <li>支持电话和视频通话，附带翻译字幕</li>
+        <li>发布时间：<span class="tag tag-upcoming">2026 Q2</span></li>
+    </ul>
+
+    <h4>Notification Summary</h4>
+    <ul>
+        <li>智能总结通知和长对话，支持 WhatsApp / Google Messages</li>
+        <li>三层级展示：L0 截断(0 tap) → L1 完整摘要(1 tap) → L2 全文(2 taps)</li>
+        <li>90%+ 质量通过率，0% 安全违规率</li>
+        <li>语言路线：EN → JA/DE/KO (Q1) → ES/FR/IT/<strong>HI</strong>/ZH (Q3)</li>
+        <li>需要：SystemUI + AiCore (Nano V2+) + PCC (OEM 版 Q2 分发)</li>
+    </ul>
+
+    <h4>Scam Detection</h4>
+    <ul>
+        <li>检测 SMS/MMS/RCS 对话诈骗，本地处理保护隐私 <span class="tag tag-available">Available</span></li>
+    </ul>
+
+    <h3>AI VM 架构 (Long-term)</h3>
+    <ul>
+        <li>Protected VM (pVM) 构建安全个性化 AI 体验</li>
+        <li>敏感用户数据在 VM 内创建/存储/访问</li>
+        <li><strong>OEM 可定制</strong>：应用、数据捐赠、Use case delegate</li>
+        <li>数据流：Android→VM (捐赠) → VM→VM (处理) → VM→Android (AI 体验)</li>
+    </ul>
+
+    <h3>MLKit Developer APIs</h3>
+    <table>
+        <tr><th>API</th><th>Capability</th><th>Timeline</th></tr>
+        <tr><td>MLKit ASR Advanced</td><td>音频→流式文本，21+ 种语言</td><td><span class="tag tag-upcoming">Q1 2026</span></td></tr>
+        <tr><td>GenAI Prompt API</td><td>自定义 Prompt 访问 Nano</td><td><span class="tag tag-available">Available</span></td></tr>
+        <tr><td>Auto Prompt Optimization</td><td>自动优化 Prompt</td><td><span class="tag tag-available">Available</span></td></tr>
+        <tr><td>Prefix Cache</td><td>显式前缀缓存管理</td><td><span class="tag tag-available">Available</span></td></tr>
+        <tr><td>Structured Decoding</td><td>结构化输出解码</td><td><span class="tag tag-upcoming">Q2 2026</span></td></tr>
+    </table>
+</div>
+
+<!-- 03 System UX -->
+<div class="section" id="s3">
+    <h2><span class="section-num">03</span>系统 UX & UI</h2>
+    <div class="section-divider"></div>
+
+    <h3>通知系统升级</h3>
+    <div class="two-col">
+        <div>
+            <h4>Notification Summaries</h4>
+            <ul>
+                <li>对话消息自动生成摘要</li>
+                <li>90%+ 质量评估（准确性/召回/措辞）</li>
+                <li>0% 安全违规率</li>
+                <li>集成：SystemUI + AiCore (Nano V2+) + PCC</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Notification Organizer</h4>
+            <ul>
+                <li>智能分类 + 自动静音低优先级</li>
+                <li>预定义分类：Promotions 默认开启</li>
+                <li>全局 + App 级精细控制</li>
+                <li>语言：EN → JA/DE (Q2'26)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Emoji: Vector → Bitmap (SBIX)</h3>
+    <ul>
+        <li>最高 192x192px (比 iOS 高 20%)，研究显示与 Apple 同等 premium</li>
+        <li><strong>系统影响</strong>：Fling 内存 +20MB，字体 220MB (6GB+) / 107MB (4-6GB)</li>
+        <li>框架变更 <span class="tag tag-upcoming">2026 Q2</span>，OEM 需年底前更新</li>
+    </ul>
+
+    <h3>Remote Compose & Widgets</h3>
+    <ul>
+        <li>全新远程 UI 框架（motion / shaders / serializable），驱动 Jetpack Glance</li>
+    </ul>
+
+    <h3>认证与生物识别</h3>
+    <table>
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Custom Biometric Prompt</td><td>开发者可嵌入自定义布局，多步认证→单次点击</td></tr>
+        <tr><td>Large Screen BiometricPrompt</td><td>半屏/对话框凭据视图，不覆盖全屏</td></tr>
+        <tr><td>Identity Check 扩大</td><td>所有 BiometricPrompt 场景适用</td></tr>
+        <tr><td>Secure Lock Device API</td><td>PIN + Class 3 生物识别双因素增强锁屏</td></tr>
+    </table>
+</div>
+
+<!-- 04 Security -->
+<div class="section" id="s4">
+    <h2><span class="section-num">04</span>防盗与安全保护</h2>
+    <div class="section-divider"></div>
+    <div class="callout callout-warn">
+        <strong>Background：</strong>印度 CEIR 数据库记录 410 万部被盗手机 (since 2019)；伦敦每 7 分钟丢 1 部；巴西每分钟 2 部。
+    </div>
+
+    <h3>完整防盗方案</h3>
+    <table>
+        <tr><th>Feature</th><th>Description</th><th>Status</th></tr>
+        <tr><td>Theft Detection Lock</td><td>检测抢夺动作自动锁屏</td><td><span class="tag tag-available">Launched</span></td></tr>
+        <tr><td>Offline Device Lock</td><td>离线自动锁屏</td><td><span class="tag tag-available">Launched</span></td></tr>
+        <tr><td>Remote Lock</td><td>远程锁定设备</td><td><span class="tag tag-available">Launched</span></td></tr>
+        <tr><td>Identity Check</td><td>敏感操作需生物识别</td><td><span class="tag tag-available">Launched</span></td></tr>
+        <tr><td><strong>App Lock</strong></td><td>任意 App 添加生物识别保护 (64% 用户需求)</td><td><span class="tag tag-new">New</span></td></tr>
+        <tr><td><strong>SIM Theft Protection</strong></td><td>自动随机 SIM PIN，防 OTP 盗用</td><td><span class="tag tag-new">New</span></td></tr>
+        <tr><td><strong>LSKF Retry</strong></td><td>锁屏尝试加固 (第10次→4h，第15次→41d)</td><td><span class="tag tag-new">New</span></td></tr>
+        <tr><td><strong>Failed Auth Lock</strong></td><td>5 次失败后锁定，用户可控</td><td><span class="tag tag-new">New</span></td></tr>
+        <tr><td><strong>Secure Lock Device</strong></td><td>Find Hub 锁定后禁用通知/Widget/QS</td><td><span class="tag tag-new">New</span></td></tr>
+        <tr><td><strong>IMEI on Lockscreen</strong></td><td>锁屏显示 IMEI</td><td><span class="tag tag-new">New</span></td></tr>
+    </table>
+
+    <h3>Developer Verification</h3>
+    <ul>
+        <li><strong>所有 GMS 设备</strong>上 App 需来自验证开发者</li>
+        <li>25Q4+ 设备须预装 Android Developer Verifier APK</li>
+        <li>执行：<strong>2026年9月</strong>起（巴西/泰国/新加坡/印尼），后续全球</li>
+        <li>Limited Distribution：免费账户，最多 20 设备</li>
+    </ul>
+</div>
+
+<!-- 05 Better Together -->
+<div class="section" id="s5">
+    <h2><span class="section-num">05</span>Better Together & 跨设备</h2>
+    <div class="section-divider"></div>
+
+    <h3>Quick Share 2026 Roadmap</h3>
+    <table>
+        <tr><th>Pillar</th><th>Features</th><th>Timeline</th></tr>
+        <tr><td>QS Everywhere</td><td>QR Cloud Transfer (Android→iOS)、SDK for Apps、Lite for CN</td><td>Q2-Q3 '26</td></tr>
+        <tr><td>Gemini / AI</td><td>拍照后主动分享提醒、Agentic Quick Share</td><td>H2 '26</td></tr>
+        <tr><td>Tap-based NFC</td><td>Tap to Share (Sharesheet)、Tap to Exchange Contacts</td><td>MBG '26</td></tr>
+        <tr><td>Windows</td><td>WiFi Direct 加速、用户反馈机制</td><td>H1-H2 '26</td></tr>
+    </table>
+
+    <h3>Output Switcher & MediaRouter</h3>
+    <ul>
+        <li><strong>智能设备推荐</strong>：通知卡片一键投屏，基于历史使用模式</li>
+        <li>新权限 <code>ACCESS_LOCAL_NETWORK</code>（Android 17 必需）</li>
+        <li>Media3-cast 默认使用系统 Output Switcher</li>
+    </ul>
+
+    <h3>Better Together Platform</h3>
+    <div class="callout callout-info">
+        Android 多设备体验碎片化严重。Google 推动统一标准，Better Together APK 将作为 Mainline 模块 (26Q4)。
+    </div>
+</div>
+
+<!-- 06 Telephony -->
+<div class="section" id="s6">
+    <h2><span class="section-num">06</span>Telephony 通信</h2>
+    <div class="section-divider"></div>
+    <table>
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Telephony Core Mainline</td><td>电话框架变为可选 Mainline 模块 (Parser → Telecom → ONS)</td></tr>
+        <tr><td>NR-NTN Satellite</td><td>2027+ 设备需 Rel-17 NR-NTN modem</td></tr>
+        <tr><td>Phone Number Verification</td><td>SIM 认证 (TS.43 + EAP-AKA) 替代 SMS OTP</td></tr>
+        <tr><td>E2EE Messages</td><td>RCS 加密消息对三方 App 隐藏 (restricted bit)</td></tr>
+        <tr><td>Message Upgrading</td><td>SMS/MMS → RCS 自动升级</td></tr>
+        <tr><td>VoIP Call Log</td><td>OTT 通话集成到系统通话记录</td></tr>
+        <tr><td>OTT QoS</td><td>自动路由 OTT 通话到 5G 高优先级切片</td></tr>
+        <tr><td>eSOS via Messaging</td><td>NB-NTN 通过消息 App 触发紧急 SOS</td></tr>
+    </table>
+
+    <h3>BT SCO Audio 重构</h3>
+    <ul>
+        <li>统一 HFP/A2DP/LE/ASHA 管理，<code>setCommunicationDevice()</code> 控制</li>
+        <li><span class="tag tag-mandatory">Android 17 VSR 强制</span></li>
+    </ul>
+</div>
+
+<!-- 07 Camera -->
+<div class="section" id="s7">
+    <h2><span class="section-num">07</span>Camera & Media</h2>
+    <div class="section-divider"></div>
+
+    <h3>Camera Testing</h3>
+    <ul>
+        <li><strong>Social Media Focus</strong>：内置 vs 三方 App 图像一致性 (FOV/亮度/白平衡)</li>
+        <li><strong>Gen2 ITS</strong>：高质量纸质图表、集成照明 (1000/180/1.6 lux)</li>
+        <li>新增 Display P3 JPEG 验证、JPEG_R/JPEG 色彩一致性测试</li>
+    </ul>
+
+    <h3>Audio Updates</h3>
+    <div class="two-col">
+        <div>
+            <h4>Codec & Format</h4>
+            <ul>
+                <li>IAMF 解码 + 扩展 HE-AAC</li>
+                <li>Ambisonics 声道 Mask</li>
+                <li>Codec Provenance 保留原始类型</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Performance</h4>
+            <ul>
+                <li>Tap-to-tone → <strong>50ms</strong></li>
+                <li>Roundtrip → <strong>50ms</strong> 全路径</li>
+                <li>USB 8ch out / 4ch in</li>
+                <li>动态 CPU 负载无毛刺</li>
+            </ul>
+        </div>
+    </div>
+    <ul>
+        <li>BT LE 助听器 + Peripheral Mode | 独立 Assistant 音量 | MMAP 低功耗</li>
+    </ul>
+</div>
+
+<!-- 08 Core OS -->
+<div class="section" id="s8">
+    <h2><span class="section-num">08</span>Core OS</h2>
+    <div class="section-divider"></div>
+
+    <h3>Mainline Updates</h3>
+    <table>
+        <tr><th>Category</th><th>Content</th></tr>
+        <tr><td>26Q2 New</td><td>WebApp Installer (optional)</td></tr>
+        <tr><td>26Q2 Updated</td><td>Network Security Config, Health Connect, Photo Picker, Permissions Expressive, BT</td></tr>
+        <tr><td>Optional→Mandatory</td><td>Profiling, CrashRecovery</td></tr>
+        <tr><td>26Q4 New</td><td>Better Together, Graphics</td></tr>
+    </table>
+
+    <h3>Core Networking</h3>
+    <table>
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>L4S</td><td>eBPF TCP 低延迟 (Samsung)，视频会议/云游戏受益</td></tr>
+        <tr><td>APFv6 → v8</td><td>VSR-17 强制 v6.1；v8 增加硬件预过滤 + TCP keepalive offload</td></tr>
+        <tr><td>CaptivePortalLogin</td><td>迁移到 Chrome Custom Tabs (自动填充/DRM/VPN)</td></tr>
+        <tr><td>HttpEngine</td><td>错误减 50%，延迟降 5-30%，比 Cronet 更优</td></tr>
+        <tr><td>ECH</td><td>TLS 1.3 加密 Client Hello</td></tr>
+    </table>
+
+    <h3>Memory & Reliability</h3>
+    <ul>
+        <li><strong>Bitmap 效率</strong>：AHAT 堆转储查看 + <code>am dumpbitmaps</code> + Traceur 分析</li>
+        <li><strong>memcg v2</strong>：Android 17 强制，节省 ~30% system_server CPU</li>
+        <li><strong>Module jar minification</strong>：R8 缩小所有 Mainline 模块</li>
+    </ul>
+</div>
+
+<!-- 09 Graphics -->
+<div class="section" id="s9">
+    <h2><span class="section-num">09</span>Gaming & Graphics</h2>
+    <div class="section-divider"></div>
+
+    <h3>Vulkan Ecosystem</h3>
+    <table>
+        <tr><th>Project</th><th>Description</th><th>Requirement</th></tr>
+        <tr><td><strong>ANGLE</strong></td><td>OpenGL 兼容层，比多数 OGL 驱动更稳定</td><td>新 SoC + A17：~100 游戏必须启用</td></tr>
+        <tr><td><strong>Skia → Vulkan</strong></td><td>UI 渲染完全迁移到 Graphite</td><td>Android 17 完成</td></tr>
+        <tr><td><strong>WebGPU</strong></td><td>替代 OpenGL 的推荐 Java/Kotlin 图形库</td><td>新 dEQP 测试</td></tr>
+        <tr><td><strong>GGI</strong></td><td>GPU 驱动 APEX，独立于 vendor 更新 4 年</td><td>A17 平台支持</td></tr>
+        <tr><td><strong>Vulkan Layers</strong></td><td>OEM 自定义 Layer (调试/游戏模式)</td><td>A18 禁止改 loader</td></tr>
+    </table>
+
+    <h3>HDR: SMPTE 2094-50</h3>
+    <ul>
+        <li>统一跨显示器 tonemapping，长期目标为 Android 默认 HDR 格式</li>
+        <li>OEM 需 gralloc HAL 支持 + HWC 暴露 LutProperties</li>
+    </ul>
+
+    <h3>Controller Support</h3>
+    <ul>
+        <li>Android 17 原生手柄设置：按键映射/摇杆互换/触发器</li>
+        <li>标准化 Top 30 控制器 KL files</li>
+    </ul>
+</div>
+
+<!-- 10 Large Screen -->
+<div class="section" id="s10">
+    <h2><span class="section-num">10</span>大屏幕体验</h2>
+    <div class="section-divider"></div>
+
+    <h3>Foldables Multitasking</h3>
+    <table>
+        <tr><th>Feature</th><th>Description</th><th>Status</th></tr>
+        <tr><td><strong>Bubble Anything</strong></td><td>任何 App 可变为悬浮气泡，无需适配</td><td><span class="tag tag-new">A17 Launch</span></td></tr>
+        <tr><td>Bubble Bar</td><td>新 UI 管理气泡，与 Taskbar 集成</td><td>Exploration</td></tr>
+        <tr><td>Content PiP</td><td>重新设计画中画 + Jetpack 库</td><td>2026+ Investment</td></tr>
+        <tr><td>3-App Split</td><td>三应用分屏</td><td>Exploration</td></tr>
+        <tr><td><strong>Virtual Gamepad</strong></td><td>折叠屏展开后虚拟手柄，16:9 游戏渲染</td><td><span class="tag tag-new">A17</span></td></tr>
+    </table>
+
+    <h3>Connected Display</h3>
+    <ul>
+        <li>多显示器独立刷新率 | HDCP <span class="tag tag-mandatory">VSR 强制</span> | DPU Readback 产品化</li>
+    </ul>
+</div>
+
+<!-- 11 Onboarding -->
+<div class="section" id="s11">
+    <h2><span class="section-num">11</span>Onboarding 开机体验</h2>
+    <div class="section-divider"></div>
+    <table>
+        <tr><th>Feature</th><th>Description</th><th>Status</th></tr>
+        <tr><td>Unified Waiting Screen</td><td>20+ 等待屏 → 1 个合并屏幕</td><td>Phase 1 Available</td></tr>
+        <tr><td>M3 Expressive Setup</td><td>Glif Expressive + Dynamic Color</td><td>Current</td></tr>
+        <tr><td><strong>Prioritized App Restore</strong></td><td>按使用频率优先恢复，立即显示占位图标</td><td>Android 15+</td></tr>
+        <tr><td>Restore Anytime</td><td>从断点恢复数据传输</td><td>In Dev</td></tr>
+        <tr><td>QuickStart</td><td>快速配对设置</td><td><span class="tag tag-mandatory">A17 Mandatory</span></td></tr>
+    </table>
+    <div class="callout callout-tip">
+        Prioritized App Restore 通过 <code>setup.enable_restore_archiving = true</code> 启用。Launcher 可能需要更新以支持 archived app 视觉。
+    </div>
+</div>
+
+<!-- 12 Kernel -->
+<div class="section" id="s12">
+    <h2><span class="section-num">12</span>Systems & Kernel</h2>
+    <div class="section-divider"></div>
+
+    <h3>Kernel Updates</h3>
+    <table>
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td><strong>Proxy Execution ON</strong></td><td>默认开启，解决互斥锁优先级反转 + proxy-rwsem</td></tr>
+        <tr><td><strong>sched_ext</strong></td><td>BPF 自定义调度器 (approved for OEM)</td></tr>
+        <tr><td>SLAB Sheaves</td><td>per-cpu 对象缓存，mmap/unmap 性能大幅提升</td></tr>
+        <tr><td>Rust Binder</td><td>内存安全 Binder 驱动（测试中）</td></tr>
+        <tr><td>SELinux Wildcard</td><td>genfscon 通配符匹配，启动时间 -15%</td></tr>
+    </table>
+
+    <h3>GKI EOL Policy</h3>
+    <table>
+        <tr><th>Kernel</th><th>Status</th></tr>
+        <tr><td>5.4</td><td><span class="tag tag-new">EOL</span> — 不再支持</td></tr>
+        <tr><td>5.10</td><td>2027.07 EOL — 26Q2 是最后支持版本</td></tr>
+        <tr><td>6.1+</td><td>Active — LTS 延长至 15 个月</td></tr>
+        <tr><td>6.18</td><td>Android 17 目标内核</td></tr>
+    </table>
+    <ul>
+        <li><strong>memcg v2</strong>：Android 17 强制 | <strong>Ashmem 废弃</strong>：迁移到 memfd</li>
+        <li><strong>ZRAM writeback</strong>：mmd 集中控制，per-app writeback 防冷启动</li>
+    </ul>
+</div>
+
+<!-- 13 Virtualization -->
+<div class="section" id="s13">
+    <h2><span class="section-num">13</span>Context Hub & 虚拟化</h2>
+    <div class="section-divider"></div>
+
+    <h3>Context Hub (CHRE)</h3>
+    <ul>
+        <li><strong>多线程 CHRE</strong>：按优先级分线程，高优可抢占低优</li>
+        <li><strong>Data Flows</strong>：共享内存队列 (单生产者/多消费者)，高频低延迟</li>
+        <li>纳米应用测试框架 + AI 辅助开发工具</li>
+    </ul>
+
+    <h3>AVF / Virtualization</h3>
+    <table>
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Dynamic DMA Buffer</td><td>pVM 动态映射 GPU/TPU 缓冲区，零拷贝</td></tr>
+        <tr><td>Multi-tenancy</td><td>多载荷共享 pVM，OEM 可增删 tenant</td></tr>
+        <tr><td>Microdroid Optimization</td><td>最小化内核 + memcg</td></tr>
+        <tr><td>Ferrochrome</td><td>GPU 加速 + 5s 启动 + M3 UI + Debian 13</td></tr>
+        <tr><td>Static VM ID</td><td>跨重启永久 VM ID (Keymint/Gatekeeper)</td></tr>
+    </table>
+</div>
+
+<!-- 14 Enterprise -->
+<div class="section" id="s14">
+    <h2><span class="section-num">14</span>Enterprise</h2>
+    <div class="section-divider"></div>
+    <table>
+        <tr><th>Feature</th><th>Description</th></tr>
+        <tr><td>Unified Update Controls</td><td>统一管理 OTA/Mainline/GMS 更新策略</td></tr>
+        <tr><td>eSIM Management</td><td>BF76 标签识别企业 eSIM</td></tr>
+        <tr><td>Device Trust</td><td>安全信号扩展到 IdP/MTD/EDR + AttestableID</td></tr>
+        <tr><td>AER Updates</td><td>最低 2 次 OS 更新、全球 6GB RAM、UUC 测试</td></tr>
+        <tr><td>Accessibility</td><td>ATF + UiAutomator 集成、EAA 合规工具</td></tr>
+    </table>
+</div>
+
+<!-- 15 Action Items -->
+<div class="section" id="s15">
+    <h2><span class="section-num">15</span>NothingOS 关键行动项</h2>
+    <div class="section-divider"></div>
+
+    <h3 style="border-color: var(--nothing-red);">Must Do</h3>
+    <div class="action-items">
+        <div class="action-item action-must"><div class="dot"></div><div><strong>Nano V4 评估</strong> — 3 月 base model 发布，尽早评估并构建特性</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>AICore 非 LLM</strong> — 6GB+ 中端设备预装 AICore APK</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>通知摘要 + 组织器</strong> — 集成 SystemUI + AiCore + PCC (Q2 OEM 版)</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>App Lock 对齐</strong> — 自有方案需与 Google 框架对齐</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>Developer Verifier</strong> — 25Q4+ 设备必须预装 APK</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>Emoji SBIX</strong> — Q2 框架变更，年底前更新字体</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>ANGLE 100 游戏</strong> — 新 SoC + A17 设备必须启用</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>QuickStart</strong> — Android 17 设备强制集成</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>M3 Expressive Setup</strong> — 采用 Glif Expressive + Dynamic Color</div></div>
+        <div class="action-item action-must"><div class="dot"></div><div><strong>Kernel EOL</strong> — 禁用 5.4，准备 5.10 迁移 (deadline 2027.07)</div></div>
+    </div>
+
+    <h3 style="border-color: var(--nothing-yellow);">Should Do</h3>
+    <div class="action-items">
+        <div class="action-item action-should"><div class="dot"></div><div><strong>AI VM</strong> — 评估 OEM 定制化机会</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>Live Translate</strong> — Q2 集成评估，印度市场高度相关</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>Prioritized App Restore</strong> — 启用优先恢复改善开箱体验</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>SIM Theft Protection</strong> — 印度盗窃高发，功能高度相关</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>Quick Share NFC</strong> — Tap to Share / Exchange Contacts</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>Bubble Anything</strong> — A17 发布功能，测试并反馈</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>BT SCO</strong> — 更新 Audio HAL，VSR 强制</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>GGI GPU APEX</strong> — 与 SoC 供应商讨论独立 GPU 更新</div></div>
+        <div class="action-item action-should"><div class="dot"></div><div><strong>SMPTE 2094-50</strong> — gralloc HAL + HWC LutProperties</div></div>
+    </div>
+
+    <h3 style="border-color: var(--nothing-green);">Nice to Have</h3>
+    <div class="action-items">
+        <div class="action-item action-nice"><div class="dot"></div><div><strong>Ferrochrome</strong> — Linux 应用兼容，GPU 加速 + 5s 启动</div></div>
+        <div class="action-item action-nice"><div class="dot"></div><div><strong>WebGPU</strong> — 未来 Java/Kotlin 图形库标准</div></div>
+        <div class="action-item action-nice"><div class="dot"></div><div><strong>Context Hub MT</strong> — 低功耗 AI 场景优化</div></div>
+        <div class="action-item action-nice"><div class="dot"></div><div><strong>Phone Number Verification</strong> — 与运营商合作替代 SMS OTP</div></div>
+        <div class="action-item action-nice"><div class="dot"></div><div><strong>L4S</strong> — eBPF TCP 低延迟 (视频/云游戏)</div></div>
+        <div class="action-item action-nice"><div class="dot"></div><div><strong>Virtual Gamepad</strong> — 折叠屏专属游戏体验</div></div>
+    </div>
+</div>
+
+<!-- 16 Timeline -->
+<div class="section" id="s16">
+    <h2><span class="section-num">16</span>时间线总览</h2>
+    <div class="section-divider"></div>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="date">2026 Q1</div>
+            <div class="events">
+                <span>MLKit ASR API</span>
+                <span>通知摘要 JA/DE/KO</span>
+                <span>Nano V4 Base Model (Mar)</span>
+                <span>Dev Verifier GA</span>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="date">2026 Q2 — Android 17</div>
+            <div class="events">
+                <span>Live Translate</span>
+                <span>Emoji SBIX</span>
+                <span>Structured Decoding</span>
+                <span>WebApp Installer</span>
+                <span>QS QR Cloud</span>
+                <span>Organizer JA/DE</span>
+                <span>AI VM OEM</span>
+                <span>PCC OEM</span>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="date">2026 Q3</div>
+            <div class="events">
+                <span>通知摘要 ES/FR/IT/HI/ZH</span>
+                <span>QS Lite for CN</span>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="date">2026 Q4</div>
+            <div class="events">
+                <span>Mainline: BeTo + Graphics</span>
+                <span>Sentinel Security Logs</span>
+                <span>Emoji Font Deadline</span>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="date">2026 H2</div>
+            <div class="events">
+                <span>Nano V4 GA</span>
+                <span>AI Quick Share</span>
+                <span>UUC Production</span>
+                <span>Agentic QS</span>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="date">2026.09</div>
+            <div class="events">
+                <span>Dev Verification Enforcement</span>
+                <span>BR / TH / SG / ID</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>Based on Google Android Partner Bootcamp 2026 · 15 Tracks · 20 PDFs</p>
+    <p class="nda">CONFIDENTIAL — NDA — SUBJECT TO CHANGE</p>
+    <p style="margin-top: 12px; opacity: 0.4;">Nothing Technology · Internal Use Only</p>
+</div>
+
+</div>
+
+<script>
+// ============================================
+// Chat / Q&A System — Multi-Provider LLM
+// ============================================
+let chatHistory = [];
+let reportContext = null;
+
+const PROVIDERS = {
+    anthropic: {
+        name: 'Anthropic (Claude)',
+        placeholder: 'sk-ant-...',
+        validate: k => k.startsWith('sk-ant-'),
+        endpoint: 'https://api.anthropic.com/v1/messages',
+        model: 'claude-haiku-4-5-20251001',
+    },
+    openai: {
+        name: 'OpenAI (GPT)',
+        placeholder: 'sk-...',
+        validate: k => k.startsWith('sk-'),
+        endpoint: 'https://api.openai.com/v1/chat/completions',
+        model: 'gpt-4o-mini',
+    },
+    deepseek: {
+        name: 'DeepSeek',
+        placeholder: 'sk-...',
+        validate: k => k.length > 10,
+        endpoint: 'https://api.deepseek.com/v1/chat/completions',
+        model: 'deepseek-chat',
+    },
+    openrouter: {
+        name: 'OpenRouter',
+        placeholder: 'sk-or-...',
+        validate: k => k.length > 10,
+        endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+        model: 'anthropic/claude-3.5-haiku',
+    },
+    custom: {
+        name: 'Custom',
+        placeholder: 'your-api-key',
+        validate: k => k.length > 5,
+        endpoint: '',
+        model: '',
+    }
+};
+
+function getProvider() {
+    return document.getElementById('providerSelect').value;
+}
+
+function onProviderChange() {
+    const p = getProvider();
+    const cfg = PROVIDERS[p];
+    document.getElementById('apiKeyInput').placeholder = cfg.placeholder;
+    document.getElementById('customEndpointRow').style.display = p === 'custom' ? 'flex' : 'none';
+
+    // Load saved key for this provider
+    const saved = localStorage.getItem('report_key_' + p);
+    if (saved) {
+        document.getElementById('apiKeyInput').value = saved;
+    } else {
+        document.getElementById('apiKeyInput').value = '';
+    }
+    onApiKeyChange();
+    localStorage.setItem('report_provider', p);
+}
+
+function toggleChat() {
+    const panel = document.getElementById('chatPanel');
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+        // Restore saved provider
+        const savedP = localStorage.getItem('report_provider');
+        if (savedP && PROVIDERS[savedP]) {
+            document.getElementById('providerSelect').value = savedP;
+        }
+        onProviderChange();
+        document.getElementById('chatInput').focus();
+    }
+}
+
+function onApiKeyChange() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    const p = getProvider();
+    const cfg = PROVIDERS[p];
+    const dot = document.getElementById('keyStatus');
+    if (cfg.validate(key)) {
+        dot.className = 'key-status active';
+        localStorage.setItem('report_key_' + p, key);
+    } else {
+        dot.className = 'key-status';
+    }
+}
+
+function getApiKey() {
+    return document.getElementById('apiKeyInput').value.trim();
+}
+
+function getReportContext() {
+    if (reportContext) return reportContext;
+    const sections = document.querySelectorAll('.section');
+    const parts = [];
+    sections.forEach(sec => parts.push(sec.innerText));
+    reportContext = parts.join('\n\n---\n\n');
+    if (reportContext.length > 80000) {
+        reportContext = reportContext.substring(0, 80000) + '\n...[truncated]';
+    }
+    return reportContext;
+}
+
+const SYSTEM_PROMPT_TEMPLATE = `You are a helpful assistant embedded in a report page about Google Android Bootcamp 2026 (Android 17 new features). Your job is to answer questions based ONLY on the report content provided below.
+
+Rules:
+- Answer in the same language as the user's question (Chinese question → Chinese answer, English → English)
+- Be concise and direct, use bullet points when helpful
+- If the question is about content NOT covered in the report, reply exactly: "材料里面没有涉及具体信息，详细咨询 Ken"
+- When referencing specific features, mention which section they're in (e.g. "在 AI 能力章节中...")
+- Do NOT make up information not present in the report
+
+Report content:
+`;
+
+function askSuggestion(btn) {
+    document.getElementById('chatInput').value = btn.textContent;
+    sendChat();
+}
+
+async function sendChat() {
+    const input = document.getElementById('chatInput');
+    const q = input.value.trim();
+    if (!q) return;
+
+    const apiKey = getApiKey();
+    const p = getProvider();
+    const cfg = PROVIDERS[p];
+
+    if (!cfg.validate(apiKey)) {
+        addMsg('请先输入有效的 API Key', 'bot');
+        return;
+    }
+
+    input.value = '';
+    addMsg(q, 'user');
+    document.getElementById('chatSuggestions').style.display = 'none';
+
+    const thinkingDiv = addMsg('<span style="opacity:0.5">Thinking...</span>', 'bot');
+    chatHistory.push({ role: 'user', content: q });
+
+    try {
+        const context = getReportContext();
+        const systemPrompt = SYSTEM_PROMPT_TEMPLATE + context;
+        const recentHistory = chatHistory.slice(-6);
+        let reply;
+
+        if (p === 'anthropic') {
+            reply = await callAnthropic(apiKey, cfg, systemPrompt, recentHistory);
+        } else {
+            // OpenAI-compatible: openai, deepseek, openrouter, custom
+            const endpoint = p === 'custom'
+                ? document.getElementById('customEndpoint').value.trim()
+                : cfg.endpoint;
+            const model = p === 'custom' ? 'default' : cfg.model;
+            reply = await callOpenAICompat(apiKey, endpoint, model, systemPrompt, recentHistory, p);
+        }
+
+        thinkingDiv.remove();
+        chatHistory.push({ role: 'assistant', content: reply });
+        addMsg(formatReply(reply), 'bot');
+
+    } catch (err) {
+        thinkingDiv.remove();
+        addMsg(`<span style="color:var(--nothing-red)">Error: ${err.message}</span>`, 'bot');
+        chatHistory.pop();
+    }
+}
+
+async function callAnthropic(apiKey, cfg, systemPrompt, messages) {
+    const res = await fetch(cfg.endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+            model: cfg.model,
+            max_tokens: 1024,
+            system: systemPrompt,
+            messages: messages
+        })
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API ${res.status}`);
+    }
+    const data = await res.json();
+    return data.content?.[0]?.text || 'No response';
+}
+
+async function callOpenAICompat(apiKey, endpoint, model, systemPrompt, messages, provider) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+    };
+    // OpenRouter needs extra headers
+    if (provider === 'openrouter') {
+        headers['HTTP-Referer'] = location.href;
+        headers['X-Title'] = 'Bootcamp Report Assistant';
+    }
+
+    const body = {
+        model: model,
+        max_tokens: 1024,
+        messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages
+        ]
+    };
+
+    const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API ${res.status}`);
+    }
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || 'No response';
+}
+
+function formatReply(text) {
+    return text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/^[-•]\s+/gm, '· ')
+        .replace(/\n/g, '<br>');
+}
+
+function addMsg(html, role) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'chat-msg chat-msg-' + (role === 'user' ? 'user' : 'bot');
+    if (role === 'user') {
+        div.textContent = html;
+    } else {
+        div.innerHTML = html;
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
+}
+
+// ============================================
+// Language Toggle: CN ↔ EN
+// ============================================
+const T = {
+    // Cover
+    'Android 17 新特性完整分析 · NothingOS 团队视角': 'Full Android 17 Feature Analysis · NothingOS Team Perspective',
+    // TOC
+    '战略优先级': 'Strategy & Priorities',
+    'AI 能力': 'AI Capabilities',
+    '系统 UX / UI': 'System UX / UI',
+    '防盗与安全': 'Theft Protection & Security',
+    '大屏幕体验': 'Large Screen',
+    '行动项': 'Action Items',
+    '时间线': 'Timeline',
+    '虚拟化': 'Virtualization',
+    // Section titles
+    '大会概览与战略优先级': 'Overview & Strategic Priorities',
+    'AI 能力': 'AI Capabilities',
+    '系统 UX & UI': 'System UX & UI',
+    '防盗与安全保护': 'Theft Protection & Security',
+    'Better Together & 跨设备': 'Better Together & Cross-Device',
+    'Telephony 通信': 'Telephony & Communications',
+    '大屏幕体验': 'Large Screen Experience',
+    'Onboarding 开机体验': 'Onboarding Experience',
+    'Context Hub & 虚拟化': 'Context Hub & Virtualization',
+    'NothingOS 关键行动项': 'NothingOS Key Action Items',
+    '时间线总览': 'Timeline Overview',
+    // Priorities
+    'Gemini 全栈 AI 深度集成到 Android 各层': 'Full-stack Gemini AI deeply integrated across Android',
+    '降低使用门槛，提升流畅度和易用性': 'Lower barriers, improve fluidity and usability',
+    '系统质量、Vulkan 驱动稳定性、测试覆盖': 'System quality, Vulkan driver stability, test coverage',
+    '手机/平板/手表/耳机/XR/TV/Auto 统一': 'Unified across phone/tablet/watch/buds/XR/TV/Auto',
+    '吸引新用户群体，包括 iOS 转入者': 'Attract new users, including iOS switchers',
+    // Callouts
+    '核心信号：': 'Key Signal: ',
+    'Google 明确将 AI 定位为 Android 对抗 iOS 的最大差异化武器。Gemini 3 的评价极高，媒体和市场已认可 "AI is Android\'s moment"。':
+        'Google positions AI as Android\'s biggest differentiator against iOS. Gemini 3 receives exceptional reviews; media and market recognize "AI is Android\'s moment".',
+    'Action Required：': 'Action Required: ',
+    'Nano V4 base model 将于 2026 年 3 月发布，Nothing 应尽早评估并构建特性。现有设备应升级到 V4 以获得系统健康收益。':
+        'Nano V4 base model releasing March 2026. Nothing should evaluate and build features ASAP. Existing devices should upgrade to V4 for system health benefits.',
+    // H3 titles
+    'Gemini Nano 演进路线': 'Gemini Nano Evolution',
+    'AICore 非 LLM 模型支持': 'AICore Non-LLM Model Support',
+    '重点 AI 功能': 'Key AI Features',
+    'AI VM 架构 (Long-term)': 'AI VM Architecture (Long-term)',
+    '通知系统升级': 'Notification System Upgrade',
+    'Emoji: Vector → Bitmap (SBIX)': 'Emoji: Vector → Bitmap (SBIX)',
+    '认证与生物识别': 'Authentication & Biometrics',
+    '完整防盗方案': 'Complete Anti-Theft Solution',
+    'BT SCO Audio 重构': 'BT SCO Audio Refactor',
+    '关键更新': 'Key Updates',
+    '内核关键更新': 'Kernel Key Updates',
+    'GKI EOL Policy': 'GKI EOL Policy',
+    // AI section
+    '文本理解': 'Text understanding',
+    '图像理解 + 多语言 + MobileNet 编码器': 'Image understanding + multilingual + MobileNet encoder',
+    '性能效率大幅提升，内存占用更小，质量不降': 'Significant performance/efficiency gains, lower memory, no quality loss',
+    '屏幕理解 + Function Calling + 动作执行': 'Screen understanding + Function Calling + action execution',
+    'OEM 可在不满足 LLM 要求的设备上集成 AICore，': 'OEMs can integrate AICore on devices not meeting LLM requirements, ',
+    '最低仅需 6GB RAM': 'minimum 6GB RAM only',
+    '语义搜索': 'Semantic Search',
+    '：300M 参数嵌入模型，自然语言查找': ': 300M param embedding model, natural language lookup',
+    '轻量级 ASR & TTS': 'Lightweight ASR & TTS',
+    '：270M 参数 Transformer': ': 270M param Transformer',
+    '主动辅助': 'Proactive Assist',
+    '：20-50M 参数动作模型': ': 20-50M param action model',
+    '中端设备（6GB+）可接入 AI 能力': 'Mid-range devices (6GB+) can access AI capabilities',
+    '预装 AICore APK 即可启用': 'Simply preload AICore APK to enable',
+    '不依赖 Gemini Nano，降低硬件门槛': 'No Gemini Nano dependency, lower hardware threshold',
+    '实时语音翻译，': 'Real-time voice translation, ',
+    '保留说话者原始声音': 'preserving speaker\'s original voice',
+    '支持电话和视频通话，附带翻译字幕': 'Supports calls & video calls with translated captions',
+    '发布时间：': 'Launch: ',
+    '智能总结通知和长对话，支持 WhatsApp / Google Messages': 'AI-summarizes notifications & long conversations, supports WhatsApp / Google Messages',
+    '三层级展示：L0 截断(0 tap) → L1 完整摘要(1 tap) → L2 全文(2 taps)': 'Three-tier display: L0 truncated(0 tap) → L1 full summary(1 tap) → L2 full content(2 taps)',
+    '90%+ 质量通过率，0% 安全违规率': '90%+ quality pass rate, 0% safety violation rate',
+    '语言路线：EN → JA/DE/KO (Q1) → ES/FR/IT/': 'Language roadmap: EN → JA/DE/KO (Q1) → ES/FR/IT/',
+    '/ZH (Q3)': '/ZH (Q3)',
+    '需要：SystemUI + AiCore (Nano V2+) + PCC (OEM 版 Q2 分发)': 'Requires: SystemUI + AiCore (Nano V2+) + PCC (OEM build distributed Q2)',
+    '检测 SMS/MMS/RCS 对话诈骗，本地处理保护隐私 ': 'Detects SMS/MMS/RCS conversational scams, on-device processing for privacy ',
+    'Protected VM (pVM) 构建安全个性化 AI 体验': 'Protected VM (pVM) enables secure personalized AI experiences',
+    '敏感用户数据在 VM 内创建/存储/访问': 'Sensitive user data created/stored/accessed inside VM',
+    'OEM 可定制': 'OEM customizable',
+    '：应用、数据捐赠、Use case delegate': ': apps, data donations, use case delegates',
+    '数据流：Android→VM (捐赠) → VM→VM (处理) → VM→Android (AI 体验)': 'Data flow: Android→VM (donate) → VM→VM (process) → VM→Android (AI experience)',
+    '音频→流式文本，21+ 种语言': 'Audio → streaming text, 21+ languages',
+    '自定义 Prompt 访问 Nano': 'Custom prompts to access Nano',
+    '自动优化 Prompt': 'Auto-optimize prompts',
+    '显式前缀缓存管理': 'Explicit prefix cache management',
+    '结构化输出解码': 'Structured output decoding',
+    // Section 3
+    '对话消息自动生成摘要': 'Auto-generates summaries from conversations',
+    '90%+ 质量评估（准确性/召回/措辞）': '90%+ quality eval (accuracy/recall/phrasing)',
+    '0% 安全违规率': '0% safety violation rate',
+    '集成：SystemUI + AiCore (Nano V2+) + PCC': 'Integration: SystemUI + AiCore (Nano V2+) + PCC',
+    '智能分类 + 自动静音低优先级': 'Smart categorization + auto-mute low priority',
+    '预定义分类：Promotions 默认开启': 'Predefined categories: Promotions on by default',
+    '全局 + App 级精细控制': 'Global + per-app granular control',
+    '语言：EN → JA/DE (Q2\'26)': 'Languages: EN → JA/DE (Q2\'26)',
+    '最高 192x192px (比 iOS 高 20%)，研究显示与 Apple 同等 premium': 'Up to 192x192px (20% higher than iOS), research shows Apple-level premium perception',
+    '系统影响': 'System impact',
+    '：Fling 内存 +20MB，字体 220MB (6GB+) / 107MB (4-6GB)': ': Fling memory +20MB, font 220MB (6GB+) / 107MB (4-6GB)',
+    '框架变更 ': 'Framework changes ',
+    '，OEM 需年底前更新': ', OEMs must update by year-end',
+    '全新远程 UI 框架（motion / shaders / serializable），驱动 Jetpack Glance': 'New remote UI framework (motion/shaders/serializable), powers Jetpack Glance',
+    '开发者可嵌入自定义布局，多步认证→单次点击': 'Developers can embed custom layouts, multi-step auth → single tap',
+    '半屏/对话框凭据视图，不覆盖全屏': 'Half-sheet/dialog credential view, doesn\'t cover full screen',
+    '所有 BiometricPrompt 场景适用': 'Applies to all BiometricPrompt surfaces',
+    'Identity Check 扩大': 'Identity Check expanded',
+    'PIN + Class 3 生物识别双因素增强锁屏': 'PIN + Class 3 biometric two-factor enhanced lockscreen',
+    // Section 4
+    'Background：': 'Background: ',
+    '印度 CEIR 数据库记录 410 万部被盗手机 (since 2019)；伦敦每 7 分钟丢 1 部；巴西每分钟 2 部。':
+        'India CEIR database records 4.1M stolen phones (since 2019); London loses 1 every 7 min; Brazil 2 per min.',
+    '检测抢夺动作自动锁屏': 'Detects snatch motion, auto-locks',
+    '离线自动锁屏': 'Auto-locks when offline',
+    '远程锁定设备': 'Lock device remotely',
+    '敏感操作需生物识别': 'Biometrics required for sensitive operations',
+    '任意 App 添加生物识别保护 (64% 用户需求)': 'Add biometric protection to any app (64% user demand)',
+    '自动随机 SIM PIN，防 OTP 盗用': 'Auto random SIM PIN, prevents OTP theft',
+    '锁屏尝试加固 (第10次→4h，第15次→41d)': 'Lockscreen retry hardening (10th→4h, 15th→41d)',
+    '5 次失败后锁定，用户可控': 'Locks after 5 failures, user-controllable',
+    'Find Hub 锁定后禁用通知/Widget/QS': 'Find Hub lock disables notifications/widgets/QS',
+    '锁屏显示 IMEI': 'Shows IMEI on lockscreen',
+    '所有 GMS 设备': 'All GMS devices',
+    '上 App 需来自验证开发者': ' apps must come from verified developers',
+    '25Q4+ 设备须预装 Android Developer Verifier APK': '25Q4+ devices must preload Android Developer Verifier APK',
+    '执行：': 'Enforcement: ',
+    '2026年9月': 'Sep 2026',
+    '起（巴西/泰国/新加坡/印尼），后续全球': ' starting (BR/TH/SG/ID), then global',
+    'Limited Distribution：免费账户，最多 20 设备': 'Limited Distribution: free account, max 20 devices',
+    // Section 5
+    '拍照后主动分享提醒、Agentic Quick Share': 'Proactive sharing nudges after capture, Agentic Quick Share',
+    'QR Cloud Transfer (Android→iOS)、SDK for Apps、Lite for CN': 'QR Cloud Transfer (Android→iOS), SDK for Apps, Lite for CN',
+    'WiFi Direct 加速、用户反馈机制': 'WiFi Direct acceleration, user feedback mechanism',
+    '智能设备推荐': 'Intelligent device suggestions',
+    '：通知卡片一键投屏，基于历史使用模式': ': one-tap casting from notification card, based on usage patterns',
+    '新权限 ': 'New permission ',
+    '（Android 17 必需）': ' (required for Android 17)',
+    'Media3-cast 默认使用系统 Output Switcher': 'Media3-cast defaults to system Output Switcher',
+    'Android 多设备体验碎片化严重。Google 推动统一标准，Better Together APK 将作为 Mainline 模块 (26Q4)。':
+        'Android multi-device experience is severely fragmented. Google pushes unified standards; Better Together APK becomes Mainline module (26Q4).',
+    // Section 6
+    '电话框架变为可选 Mainline 模块 (Parser → Telecom → ONS)': 'Telephony framework becomes optional Mainline module (Parser → Telecom → ONS)',
+    '2027+ 设备需 Rel-17 NR-NTN modem': '2027+ devices need Rel-17 NR-NTN modem',
+    'SIM 认证 (TS.43 + EAP-AKA) 替代 SMS OTP': 'SIM auth (TS.43 + EAP-AKA) replaces SMS OTP',
+    'RCS 加密消息对三方 App 隐藏 (restricted bit)': 'RCS encrypted messages hidden from 3P apps (restricted bit)',
+    'SMS/MMS → RCS 自动升级': 'SMS/MMS → RCS auto upgrade',
+    'OTT 通话集成到系统通话记录': 'OTT calls integrated into system call log',
+    '自动路由 OTT 通话到 5G 高优先级切片': 'Auto-routes OTT calls to 5G priority slice',
+    'NB-NTN 通过消息 App 触发紧急 SOS': 'NB-NTN triggers emergency SOS via messaging app',
+    '统一 HFP/A2DP/LE/ASHA 管理，': 'Unified HFP/A2DP/LE/ASHA management, ',
+    ' 控制': ' control',
+    // Section 7
+    'Social Media Focus': 'Social Media Focus',
+    '：内置 vs 三方 App 图像一致性 (FOV/亮度/白平衡)': ': built-in vs 3P app image parity (FOV/brightness/WB)',
+    'Gen2 ITS': 'Gen2 ITS',
+    '：高质量纸质图表、集成照明 (1000/180/1.6 lux)': ': high-quality paper charts, integrated lighting (1000/180/1.6 lux)',
+    '新增 Display P3 JPEG 验证、JPEG_R/JPEG 色彩一致性测试': 'New Display P3 JPEG validation, JPEG_R/JPEG color consistency tests',
+    'IAMF 解码 + 扩展 HE-AAC': 'IAMF decode + extended HE-AAC',
+    'Ambisonics 声道 Mask': 'Ambisonics channel masks',
+    'Codec Provenance 保留原始类型': 'Codec Provenance preserves original media type',
+    'Tap-to-tone → ': 'Tap-to-tone → ',
+    'Roundtrip → ': 'Roundtrip → ',
+    ' 全路径': ' all paths',
+    '动态 CPU 负载无毛刺': 'Glitch-free dynamic CPU load switching',
+    'BT LE 助听器 + Peripheral Mode | 独立 Assistant 音量 | MMAP 低功耗': 'BT LE hearing aids + Peripheral Mode | Independent assistant volume | MMAP low power',
+    // Section 8
+    'eBPF TCP 低延迟 (Samsung)，视频会议/云游戏受益': 'eBPF TCP low latency (Samsung), benefits video conf/cloud gaming',
+    'VSR-17 强制 v6.1；v8 增加硬件预过滤 + TCP keepalive offload': 'VSR-17 mandates v6.1; v8 adds HW prefilter + TCP keepalive offload',
+    '迁移到 Chrome Custom Tabs (自动填充/DRM/VPN)': 'Migrated to Chrome Custom Tabs (autofill/DRM/VPN)',
+    '错误减 50%，延迟降 5-30%，比 Cronet 更优': '50% fewer errors, 5-30% lower latency, better than Cronet',
+    'Bitmap 效率': 'Bitmap efficiency',
+    '：AHAT 堆转储查看 + ': ': AHAT heap dump viewer + ',
+    ' + Traceur 分析': ' + Traceur analysis',
+    'memcg v2': 'memcg v2',
+    '：Android 17 强制，节省 ~30% system_server CPU': ': mandatory for Android 17, saves ~30% system_server CPU',
+    'Module jar minification': 'Module jar minification',
+    '：R8 缩小所有 Mainline 模块': ': R8 shrinks all Mainline modules',
+    // Section 9
+    'OpenGL 兼容层，比多数 OGL 驱动更稳定': 'OpenGL compat layer, more stable than most OGL drivers',
+    '新 SoC + A17：~100 游戏必须启用': 'New SoC + A17: ~100 games must enable',
+    'UI 渲染完全迁移到 Graphite': 'UI rendering fully migrated to Graphite',
+    '替代 OpenGL 的推荐 Java/Kotlin 图形库': 'Recommended Java/Kotlin graphics lib replacing OpenGL',
+    '新 dEQP 测试': 'New dEQP tests',
+    'GPU 驱动 APEX，独立于 vendor 更新 4 年': 'GPU driver APEX, updated independently from vendor for 4 years',
+    'OEM 自定义 Layer (调试/游戏模式)': 'OEM custom layers (debug/game mode)',
+    'A18 禁止改 loader': 'A18 forbids modifying loader',
+    '统一跨显示器 tonemapping，长期目标为 Android 默认 HDR 格式': 'Unified cross-display tonemapping, long-term target as Android default HDR format',
+    'OEM 需 gralloc HAL 支持 + HWC 暴露 LutProperties': 'OEMs need gralloc HAL support + HWC expose LutProperties',
+    'Android 17 原生手柄设置：按键映射/摇杆互换/触发器': 'Android 17 native gamepad settings: button remap/stick swap/triggers',
+    '标准化 Top 30 控制器 KL files': 'Standardized top 30 controller KL files',
+    // Section 10
+    '任何 App 可变为悬浮气泡，无需适配': 'Any app becomes a floating bubble, no app changes needed',
+    '新 UI 管理气泡，与 Taskbar 集成': 'New UI for managing bubbles, integrated with Taskbar',
+    '重新设计画中画 + Jetpack 库': 'Redesigned PiP + Jetpack library',
+    '三应用分屏': 'Three-app split screen',
+    '折叠屏展开后虚拟手柄，16:9 游戏渲染': 'Virtual gamepad on unfold, games render at 16:9',
+    '多显示器独立刷新率 | HDCP ': 'Independent per-display refresh rates | HDCP ',
+    ' | DPU Readback 产品化': ' | DPU Readback productionized',
+    // Section 11
+    '20+ 等待屏 → 1 个合并屏幕': '20+ waiting screens → 1 consolidated screen',
+    '新 Glif Expressive 设计语言，动态色彩': 'New Glif Expressive design language, dynamic color',
+    '按使用频率优先恢复，立即显示占位图标': 'Priority restore by usage frequency, immediate placeholder icons',
+    '从断点恢复数据传输': 'Resume data transfer from failure point',
+    '快速配对设置': 'Quick paired setup flow',
+    'Prioritized App Restore 通过 ': 'Prioritized App Restore enabled via ',
+    ' 启用。Launcher 可能需要更新以支持 archived app 视觉。': '. Launcher may need update for archived app visuals.',
+    // Section 12
+    '默认开启，解决互斥锁优先级反转 + proxy-rwsem': 'On by default, resolves mutex priority inversion + proxy-rwsem',
+    '通过 BPF 扩展自定义调度器逻辑（"approved" 状态）': 'BPF-based custom scheduler logic ("approved" status)',
+    'per-cpu 对象缓存，大幅提升 mmap/unmap 性能': 'Per-cpu object cache, major mmap/unmap perf improvement',
+    '内存安全 Binder 驱动（测试中）': 'Memory-safe Binder driver (in testing)',
+    'genfscon 通配符匹配，启动时间 -15%': 'genfscon wildcard matching, boot time -15%',
+    ' — 不再支持': ' — No longer supported',
+    '2027.07 EOL — 26Q2 是最后支持版本': '2027.07 EOL — 26Q2 is the last supported release',
+    'Active — LTS 延长至 15 个月': 'Active — LTS extended to 15 months',
+    'Android 17 目标内核': 'Android 17 target kernel',
+    '：Android 17 强制 | ': ': Android 17 mandatory | ',
+    'Ashmem 废弃': 'Ashmem deprecated',
+    '：迁移到 memfd': ': migrating to memfd',
+    'ZRAM writeback': 'ZRAM writeback',
+    '：mmd 集中控制，per-app writeback 防冷启动': ': mmd centralized control, per-app writeback prevents cold starts',
+    // Section 13
+    '多线程 CHRE': 'Multi-threaded CHRE',
+    '：按优先级分线程，高优可抢占低优': ': priority-based threading, high-priority preempts low',
+    '：共享内存队列 (单生产者/多消费者)，高频低延迟': ': shared memory queues (single-producer/multi-consumer), high-freq low-latency',
+    '纳米应用测试框架 + AI 辅助开发工具': 'Nanoapp test framework + AI-assisted dev tools',
+    'pVM 动态映射 GPU/TPU 缓冲区，零拷贝': 'pVM dynamic GPU/TPU buffer mapping, zero-copy',
+    '多载荷共享 pVM，OEM 可增删 tenant': 'Multi-payload sharing pVM, OEMs can add/remove tenants',
+    '最小化内核 + memcg': 'Minimized kernel + memcg',
+    'GPU 加速 + 5s 启动 + M3 UI + Debian 13': 'GPU accel + 5s boot + M3 UI + Debian 13',
+    '跨重启永久 VM ID (Keymint/Gatekeeper)': 'Persistent VM ID across reboots (Keymint/Gatekeeper)',
+    // Section 14
+    '统一管理 OTA/Mainline/GMS 更新策略': 'Unified OTA/Mainline/GMS update policy management',
+    'BF76 标签识别企业 eSIM': 'BF76 tags identify enterprise eSIMs',
+    '安全信号扩展到 IdP/MTD/EDR + AttestableID': 'Security signals extended to IdP/MTD/EDR + AttestableID',
+    '最低 2 次 OS 更新、全球 6GB RAM、UUC 测试': 'Min 2 OS updates, global 6GB RAM, UUC testing',
+    'ATF + UiAutomator 集成、EAA 合规工具': 'ATF + UiAutomator integration, EAA compliance tools',
+    // Action items
+    ' — 3 月 base model 发布，尽早评估并构建特性': ' — Base model releasing March, evaluate and build features ASAP',
+    ' — 6GB+ 中端设备预装 AICore APK': ' — Preload AICore APK on 6GB+ mid-range devices',
+    ' — 集成 SystemUI + AiCore + PCC (Q2 OEM 版)': ' — Integrate SystemUI + AiCore + PCC (Q2 OEM build)',
+    ' — 自有方案需与 Google 框架对齐': ' — Own solution must align with Google framework',
+    ' — 25Q4+ 设备必须预装 APK': ' — 25Q4+ devices must preload APK',
+    ' — Q2 框架变更，年底前更新字体': ' — Q2 framework change, update font by year-end',
+    ' — 新 SoC + A17 设备必须为约 100 款游戏启用 ANGLE': ' — New SoC + A17 must enable ANGLE for ~100 games',
+    ' — Android 17 设备强制集成': ' — Mandatory for Android 17 devices',
+    ' — 采用 Glif Expressive + Dynamic Color': ' — Adopt Glif Expressive + Dynamic Color',
+    ' — 禁用 5.4，准备 5.10 迁移 (deadline 2027.07)': ' — Disable 5.4, prepare 5.10 migration (deadline 2027.07)',
+    ' — 评估 OEM 定制化机会': ' — Evaluate OEM customization opportunities',
+    ' — Q2 集成评估，印度市场高度相关': ' — Evaluate Q2 integration, highly relevant for India market',
+    ' — 启用优先恢复改善开箱体验': ' — Enable priority restore to improve OOBE',
+    ' — 印度盗窃高发，功能高度相关': ' — High theft in India, highly relevant feature',
+    ' — Tap to Share / Exchange Contacts': ' — Tap to Share / Exchange Contacts',
+    ' — A17 发布功能，测试并反馈': ' — A17 launch feature, test and provide feedback',
+    ' — 更新 Audio HAL，VSR 强制': ' — Update Audio HAL, VSR mandatory',
+    ' — 与 SoC 供应商讨论独立 GPU 更新': ' — Discuss independent GPU updates with SoC vendors',
+    ' — gralloc HAL + HWC LutProperties': ' — gralloc HAL + HWC LutProperties',
+    ' — VSR 新要求，更新 BT HAL': ' — New VSR requirement, update BT HAL',
+    ' — Linux 应用兼容，GPU 加速 + 5s 启动': ' — Linux app compat, GPU accel + 5s boot',
+    ' — 未来 Java/Kotlin 图形库标准': ' — Future Java/Kotlin graphics standard',
+    ' — 低功耗 AI 场景优化': ' — Low-power AI scenario optimization',
+    ' — 与运营商合作替代 SMS OTP': ' — Partner with carriers to replace SMS OTP',
+    ' — eBPF TCP 低延迟 (视频/云游戏)': ' — eBPF TCP low-latency (video/cloud gaming)',
+    ' — 折叠屏专属游戏体验': ' — Foldable-exclusive gaming experience',
+};
+
+let currentLang = 'zh';
+const originalTexts = new Map();
+
+function toggleLang() {
+    const targetLang = currentLang === 'zh' ? 'en' : 'zh';
+
+    // Walk all text nodes
+    const walker = document.createTreeWalker(
+        document.querySelector('.container'),
+        NodeFilter.SHOW_TEXT,
+        null
+    );
+
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    for (const node of textNodes) {
+        const text = node.textContent;
+        if (!text.trim()) continue;
+
+        if (targetLang === 'en') {
+            // Store original and try to translate
+            for (const [zh, en] of Object.entries(T)) {
+                if (text.includes(zh)) {
+                    if (!originalTexts.has(node)) {
+                        originalTexts.set(node, text);
+                    }
+                    node.textContent = node.textContent.replace(zh, en);
+                }
+            }
+        } else {
+            // Restore original
+            if (originalTexts.has(node)) {
+                node.textContent = originalTexts.get(node);
+            }
+        }
+    }
+
+    // Update button state
+    currentLang = targetLang;
+    document.getElementById('lang-zh').className = targetLang === 'zh' ? 'active' : '';
+    document.getElementById('lang-en').className = targetLang === 'en' ? 'active' : '';
+}
+</script>
+
+</body>
+</html>
